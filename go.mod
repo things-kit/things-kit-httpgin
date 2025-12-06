@@ -7,16 +7,10 @@ toolchain go1.24.4
 require (
 	github.com/gin-gonic/gin v1.9.1
 	github.com/spf13/viper v1.21.0
-	github.com/things-kit/core v0.0.0
-	github.com/things-kit/things-kit-http v0.0.0
+	github.com/things-kit/core v0.1.0
+	github.com/things-kit/things-kit-http v0.1.0
 	go.uber.org/fx v1.24.0
 )
-
-// Replace with local paths for development
-// Remove these before publishing
-replace github.com/things-kit/core => ../things-kit
-
-replace github.com/things-kit/things-kit-http => ../things-kit-http
 
 require (
 	github.com/bytedance/sonic v1.9.1 // indirect
@@ -56,7 +50,3 @@ require (
 	google.golang.org/protobuf v1.31.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
-
-replace github.com/things-kit/module/http => ../http
-
-replace github.com/things-kit/module/log => ../log
