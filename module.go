@@ -6,7 +6,6 @@ package httpgin
 import (
 	"context"
 
-	"github.com/gin-gonic/gin"
 	"github.com/things-kit/core/log"
 	httpmodule "github.com/things-kit/things-kit-http"
 	"go.uber.org/fx"
@@ -26,27 +25,24 @@ var Module = fx.Module("httpgin",
 	fx.Invoke(RunHttpServer),
 )
 
-// GinHandler is a Gin-specific implementation of http.Handler.
-// Handlers that implement this interface can be registered with AsGinHandler.
-type GinHandler interface {
-	RegisterRoutes(engine *gin.Engine)
-}
-
 // HttpServerParams contains all dependencies needed to run the HTTP server.
 type HttpServerParams struct {
 	fx.In
 	Lifecycle fx.Lifecycle
 	Logger    log.Logger
 	Config    *Config
-	Handlers  []GinHandler `group:"http.handlers"`
+	Handlers  []httpmodule.Handler `group:"http.handlers"`
 }
 
 // RunHttpServer starts the HTTP server with registered handlers.
 // This is invoked by Fx during application startup.
 func RunHttpServer(p HttpServerParams, server *GinServer) {
+	// Wrap the gin.Engine in our abstract Router
+	router := newGinRouter(server.Engine())
+
 	// Register all provided handlers
 	for _, handler := range p.Handlers {
-		handler.RegisterRoutes(server.engine)
+		handler.RegisterRoutes(router)
 	}
 
 	p.Lifecycle.Append(fx.Hook{
@@ -84,7 +80,7 @@ func AsGinHandler(constructor any) fx.Option {
 	return fx.Provide(
 		fx.Annotate(
 			constructor,
-			fx.As(new(GinHandler)),
+			fx.As(new(httpmodule.Handler)),
 			fx.ResultTags(`group:"http.handlers"`),
 		),
 	)
